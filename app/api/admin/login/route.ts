@@ -1,0 +1,2 @@
+import { NextRequest, NextResponse } from "next/server"; import { createSessionResponse, verifyPassword } from "@/lib/admin-auth";
+export async function POST(request: NextRequest) { const { password } = await request.json() as { password?: string }; if (typeof password !== "string" || !(await verifyPassword(password))) return NextResponse.json({ error: "Incorrect password" }, { status: 401 }); return createSessionResponse({ ok: true }); }

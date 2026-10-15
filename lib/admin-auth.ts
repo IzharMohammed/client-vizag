@@ -1,15 +1,28 @@
-import { createHmac, pbkdf2Sync, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, pbkdf2Sync, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 const cookieName = "put_admin";
 
 function sign(value: string) {
-  const secret = process.env.ADMIN_SESSION_SECRET;
-  if (!secret) throw new Error("ADMIN_SESSION_SECRET is not configured.");
+  const configuredSecret =
+    process.env.ADMIN_SESSION_SECRET ||
+    process.env.ADMIN_PASSWORD ||
+    process.env.ADMIN_PASSWORD_HASH;
+  if (!configuredSecret) throw new Error("Admin authentication is not configured.");
+  const secret = createHash("sha256")
+    .update(`chettu-kinda-pesarattu:admin-session:${configuredSecret}`)
+    .digest();
   return createHmac("sha256", secret).update(value).digest("base64url");
 }
 
 export async function verifyPassword(password: string) {
+  const configuredPassword = process.env.ADMIN_PASSWORD;
+  if (configuredPassword) {
+    const actual = Buffer.from(password);
+    const expected = Buffer.from(configuredPassword);
+    return actual.length === expected.length && timingSafeEqual(actual, expected);
+  }
+
   const [iterationsRaw, saltRaw, hashRaw] = (
     process.env.ADMIN_PASSWORD_HASH || ""
   ).split(".");
@@ -43,7 +56,11 @@ export async function createSessionResponse(data: unknown) {
 }
 
 export async function isAdmin(request: NextRequest) {
-  if (!process.env.ADMIN_SESSION_SECRET) return false;
+  if (
+    !process.env.ADMIN_SESSION_SECRET &&
+    !process.env.ADMIN_PASSWORD &&
+    !process.env.ADMIN_PASSWORD_HASH
+  ) return false;
   const token = request.cookies.get(cookieName)?.value;
   if (!token) return false;
   const parts = token.split(".");

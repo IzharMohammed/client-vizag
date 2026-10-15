@@ -3,21 +3,25 @@ import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const siteUrl = getSiteUrl();
-const title = "Andhra Roots Kitchen | Authentic Andhra Food in Vizag";
+const restaurantName = "Andhra Root Kitchens (Chettu Kinda Pesarattu)";
+const title = `${restaurantName} | Andhra Breakfast in Vizag`;
 const description =
-  "Fresh pesarattu and authentic Andhra breakfast favourites in Visakhapatnam. Explore our English–Telugu menu, team and verified Google reviews.";
+  "Andhra Root Kitchens (Chettu Kinda Pesarattu) serves fresh pesarattu, idli, poori and authentic Andhra breakfast in Visakhapatnam. Explore our English–Telugu menu and guest reviews.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: title,
-    template: "%s | Andhra Roots Kitchen",
+    template: "%s | Andhra Root Kitchens",
   },
   description,
-  applicationName: "Andhra Roots Kitchen",
+  applicationName: restaurantName,
   category: "restaurant",
   keywords: [
     "pesarattu Vizag",
+    "Andhra Root Kitchens",
+    "Andhra Root Kitchens Vizag",
+    "Chettu Kinda Pesarattu",
     "Andhra breakfast Visakhapatnam",
     "best pesarattu Vizag",
     "authentic Andhra food Vizag",
@@ -31,7 +35,7 @@ export const metadata: Metadata = {
     title,
     description,
     url: siteUrl,
-    siteName: "Andhra Roots Kitchen",
+    siteName: restaurantName,
     locale: "en_IN",
     alternateLocale: ["te_IN"],
     type: "website",
@@ -77,7 +81,8 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Restaurant",
     "@id": `${siteUrl}/#restaurant`,
-    name: "Andhra Roots Kitchen",
+    name: restaurantName,
+    alternateName: ["Chettu Kinda Pesarattu", "చెట్టు కింద పెసరట్టు", "Andhra Roots Kitchen"],
     slogan: "Rooted in Tradition · Served with Love",
     description,
     url: siteUrl,

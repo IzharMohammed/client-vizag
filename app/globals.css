@@ -11,8 +11,9 @@ a { color:inherit; text-decoration:none; }
 button { font:inherit; }
 .telugu { font-family:"Noto Sans Telugu","Nirmala UI",Arial,sans-serif; }
 .site-header { height:78px; position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:0 clamp(20px,5vw,76px); background:rgba(255,253,247,.93); backdrop-filter:blur(14px); border-bottom:1px solid rgba(25,48,39,.1); }
-.brand { display:flex; align-items:center; gap:11px; font-size:14px; font-weight:800; line-height:.95; letter-spacing:-.02em; }
+.brand { display:flex; align-items:center; gap:11px; flex-shrink:0; font-size:14px; font-weight:800; line-height:.95; letter-spacing:-.02em; }
 .brand em { color:var(--leaf); font-family:Georgia,serif; font-weight:500; }
+.site-header>.brand em,.admin-brand em { font-size:11px; }
 .brand-mark { width:38px; height:38px; display:grid; place-items:center; color:var(--paper); background:var(--forest); border-radius:50% 50% 44% 56%; transform:rotate(-8deg); }
 .brand-mark svg { transform:rotate(8deg); }
 .desktop-nav { display:flex; gap:34px; }
@@ -87,13 +88,13 @@ button { font:inherit; }
 .rating-block span { display:flex; gap:2px; }
 .rating-block small { display:block; margin-top:5px; color:rgba(255,255,255,.58); }
 .reviews-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:50px; }
-.review-card { min-height:300px; display:flex; flex-direction:column; padding:28px; background:#244235; border:1px solid rgba(255,255,255,.1); }
-.review-card>svg { color:var(--gold); }
-.review-card>p { flex:1; font:19px/1.55 Georgia,serif; }
-.review-card>div { display:flex; align-items:center; gap:10px; }
-.review-card img,.avatar { width:38px; height:38px; border-radius:50%; display:grid; place-items:center; background:var(--lime); color:var(--forest); font-weight:800; }
-.review-card>div p { margin:0; font-size:12px; }
-.review-card>div small { display:block; margin-top:3px; color:rgba(255,255,255,.5); }
+.review-card { min-height:300px; gap:0; padding:28px; border-radius:2px; color:white; background:#244235; border:1px solid rgba(255,255,255,.1); box-shadow:none; }
+.review-card>svg { flex:none; color:var(--gold); }
+.testimonial-copy { flex:1; padding:22px 0; font:19px/1.55 Georgia,serif; }
+.testimonial-author { gap:10px; padding:0; }
+.review-card img,.avatar { width:38px; height:38px; border-radius:50%; display:grid; place-items:center; object-fit:cover; background:var(--lime); color:var(--forest); font-weight:800; }
+.testimonial-author p { margin:0; font-size:12px; }
+.testimonial-author small { display:block; margin-top:3px; color:rgba(255,255,255,.5); }
 .review-card>a { display:flex; gap:6px; align-items:center; margin-top:18px; color:var(--lime); font-size:11px; font-weight:800; }
 .reviews-empty { min-height:230px; margin-top:48px; display:flex; align-items:center; gap:28px; padding:34px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.04); }
 .google-g { flex:0 0 auto; width:72px; height:72px; display:grid; place-items:center; border-radius:50%; background:white; color:#4285f4; font:700 38px Arial; }
@@ -116,7 +117,7 @@ footer p,footer>a:last-child { color:#728078; font-size:11px; }
   .team-grid,.reviews-grid { grid-template-columns:1fr 1fr; } .reviews-top { align-items:flex-start; flex-direction:column; }
 }
 @media (max-width:600px) {
-  .site-header { height:70px; } .mobile-nav { top:70px; } .hero { min-height:780px; } .hero-content { margin-left:20px; padding:70px 20px 150px 0; } .hero h1 { font-size:56px; } .hero-copy { font-size:16px; } .hero-buttons { flex-direction:column; align-items:stretch; } .hero-notes { left:20px; bottom:22px; flex-direction:column; gap:10px; }
+  .site-header { height:70px; } .site-header>.brand { font-size:12px; } .site-header>.brand em { font-size:10px; } .mobile-nav { top:70px; } .hero { min-height:780px; } .hero-content { margin-left:20px; padding:70px 20px 150px 0; } .hero h1 { font-size:56px; } .hero-copy { font-size:16px; } .hero-buttons { flex-direction:column; align-items:stretch; } .hero-notes { left:20px; bottom:22px; flex-direction:column; gap:10px; }
   .section { padding:78px 20px; } .section-head { margin-bottom:36px; } .section-head h2,.reviews-top h2,.visit-section h2 { font-size:43px; }
   .menu-grid,.team-grid,.reviews-grid { grid-template-columns:1fr; } .menu-photo { height:270px; } .menu-details h3 { font-size:23px; }
   .story-copy { padding:70px 20px; } .story-copy h2 { font-size:45px; } .story-values { grid-template-columns:1fr; }
@@ -206,6 +207,7 @@ footer p,footer>a:last-child { color:#728078; font-size:11px; }
 .record .available { background:#e1efdc; color:#3f7749; } .record .unavailable { background:#eee; color:#777; }
 .record>button { width:32px; height:32px; display:grid; place-items:center; border:0; color:#52635b; background:#f1f3ef; cursor:pointer; }
 .record>button.danger { color:#a7352b; }
+.testimonial-record { grid-template-columns:48px minmax(120px,1fr) auto 34px 34px; }
 .empty-admin { padding:34px; text-align:center; color:#869188; font-size:12px; line-height:1.6; border:1px dashed #cdd4cc; }
 .reviews-admin { max-width:900px; display:grid; grid-template-columns:80px 1fr; gap:28px; margin-top:28px; padding:40px; background:white; border:1px solid #e1e5de; }
 .reviews-admin .google-g { border:1px solid #e6e6e6; }

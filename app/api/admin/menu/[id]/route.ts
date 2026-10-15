@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
-import { d1Execute, d1First, isD1Configured } from "@/lib/d1";
+import { dbExecute, dbFirst, isDatabaseConfigured } from "@/lib/postgres";
 import { deleteImage, isR2Configured } from "@/lib/r2";
 
 type ImageRow = { image_key: string | null };
@@ -15,7 +15,7 @@ export async function PATCH(
 ) {
   const denied = await requireAdmin(request);
   if (denied) return denied;
-  if (!isD1Configured()) {
+  if (!isDatabaseConfigured()) {
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
   }
 
@@ -24,16 +24,16 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid menu item" }, { status: 400 });
   }
   const body = (await request.json()) as Record<string, unknown>;
-  const old = await d1First<ImageRow>(
-    "SELECT image_key FROM menu_items WHERE id=?",
+  const old = await dbFirst<ImageRow>(
+    "SELECT image_key FROM menu_items WHERE id=$1",
     [id],
   );
   if (old?.image_key && old.image_key !== body.imageKey && !isR2Configured()) {
     return NextResponse.json({ error: "R2 is not configured" }, { status: 503 });
   }
 
-  await d1Execute(
-    "UPDATE menu_items SET name_en=?,name_te=?,description_en=?,description_te=?,price=?,category=?,image_key=?,is_available=?,sort_order=? WHERE id=?",
+  await dbExecute(
+    "UPDATE menu_items SET name_en=$1,name_te=$2,description_en=$3,description_te=$4,price=$5,category=$6,image_key=$7,is_available=$8,sort_order=$9 WHERE id=$10",
     [
       body.nameEn,
       body.nameTe,
@@ -42,7 +42,7 @@ export async function PATCH(
       Math.round(Number(body.price)),
       body.category || "Breakfast",
       body.imageKey || null,
-      body.isAvailable === false ? 0 : 1,
+      body.isAvailable !== false,
       Number(body.sortOrder) || 0,
       id,
     ],
@@ -59,7 +59,7 @@ export async function DELETE(
 ) {
   const denied = await requireAdmin(request);
   if (denied) return denied;
-  if (!isD1Configured()) {
+  if (!isDatabaseConfigured()) {
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
   }
 
@@ -67,15 +67,15 @@ export async function DELETE(
   if (!validId(id)) {
     return NextResponse.json({ error: "Invalid menu item" }, { status: 400 });
   }
-  const old = await d1First<ImageRow>(
-    "SELECT image_key FROM menu_items WHERE id=?",
+  const old = await dbFirst<ImageRow>(
+    "SELECT image_key FROM menu_items WHERE id=$1",
     [id],
   );
   if (old?.image_key && !isR2Configured()) {
     return NextResponse.json({ error: "R2 is not configured" }, { status: 503 });
   }
 
-  await d1Execute("DELETE FROM menu_items WHERE id=?", [id]);
+  await dbExecute("DELETE FROM menu_items WHERE id=$1", [id]);
   await deleteImage(old?.image_key);
   return NextResponse.json({ ok: true });
 }

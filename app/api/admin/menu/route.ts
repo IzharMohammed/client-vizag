@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
-import { d1Execute, isD1Configured } from "@/lib/d1";
+import { dbFirst, isDatabaseConfigured } from "@/lib/postgres";
 import { getMenu } from "@/lib/records";
 
 export async function GET(request: NextRequest) {
   const denied = await requireAdmin(request);
   if (denied) return denied;
-  if (!isD1Configured()) {
+  if (!isDatabaseConfigured()) {
     return NextResponse.json(
-      { error: "Cloudflare D1 environment variables are not configured." },
+      { error: "Neon DATABASE_URL is not configured." },
       { status: 503 },
     );
   }
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const denied = await requireAdmin(request);
   if (denied) return denied;
-  if (!isD1Configured()) {
+  if (!isDatabaseConfigured()) {
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
   }
 
@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const meta = await d1Execute(
-    "INSERT INTO menu_items (name_en,name_te,description_en,description_te,price,category,image_key,is_available,sort_order,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)",
+  const created = await dbFirst<{ id: number }>(
+    "INSERT INTO menu_items (name_en,name_te,description_en,description_te,price,category,image_key,is_available,sort_order,created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id",
     [
       body.nameEn,
       body.nameTe,
@@ -40,10 +40,10 @@ export async function POST(request: NextRequest) {
       Math.round(Number(body.price)),
       body.category || "Breakfast",
       body.imageKey || null,
-      body.isAvailable === false ? 0 : 1,
+      body.isAvailable !== false,
       Number(body.sortOrder) || 0,
       new Date().toISOString(),
     ],
   );
-  return NextResponse.json({ ok: true, id: meta.last_row_id });
+  return NextResponse.json({ ok: true, id: created?.id });
 }

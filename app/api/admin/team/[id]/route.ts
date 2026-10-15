@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
-import { d1Execute, d1First, isD1Configured } from "@/lib/d1";
+import { dbExecute, dbFirst, isDatabaseConfigured } from "@/lib/postgres";
 import { deleteImage, isR2Configured } from "@/lib/r2";
 
 type ImageRow = { image_key: string | null };
@@ -15,7 +15,7 @@ export async function PATCH(
 ) {
   const denied = await requireAdmin(request);
   if (denied) return denied;
-  if (!isD1Configured()) {
+  if (!isDatabaseConfigured()) {
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
   }
 
@@ -24,16 +24,16 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid team member" }, { status: 400 });
   }
   const body = (await request.json()) as Record<string, unknown>;
-  const old = await d1First<ImageRow>(
-    "SELECT image_key FROM team_members WHERE id=?",
+  const old = await dbFirst<ImageRow>(
+    "SELECT image_key FROM team_members WHERE id=$1",
     [id],
   );
   if (old?.image_key && old.image_key !== body.imageKey && !isR2Configured()) {
     return NextResponse.json({ error: "R2 is not configured" }, { status: 503 });
   }
 
-  await d1Execute(
-    "UPDATE team_members SET name=?,role_en=?,role_te=?,bio_en=?,bio_te=?,image_key=?,sort_order=? WHERE id=?",
+  await dbExecute(
+    "UPDATE team_members SET name=$1,role_en=$2,role_te=$3,bio_en=$4,bio_te=$5,image_key=$6,sort_order=$7 WHERE id=$8",
     [
       body.name,
       body.roleEn,
@@ -57,7 +57,7 @@ export async function DELETE(
 ) {
   const denied = await requireAdmin(request);
   if (denied) return denied;
-  if (!isD1Configured()) {
+  if (!isDatabaseConfigured()) {
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
   }
 
@@ -65,15 +65,15 @@ export async function DELETE(
   if (!validId(id)) {
     return NextResponse.json({ error: "Invalid team member" }, { status: 400 });
   }
-  const old = await d1First<ImageRow>(
-    "SELECT image_key FROM team_members WHERE id=?",
+  const old = await dbFirst<ImageRow>(
+    "SELECT image_key FROM team_members WHERE id=$1",
     [id],
   );
   if (old?.image_key && !isR2Configured()) {
     return NextResponse.json({ error: "R2 is not configured" }, { status: 503 });
   }
 
-  await d1Execute("DELETE FROM team_members WHERE id=?", [id]);
+  await dbExecute("DELETE FROM team_members WHERE id=$1", [id]);
   await deleteImage(old?.image_key);
   return NextResponse.json({ ok: true });
 }

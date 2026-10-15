@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
-import { d1Execute, isD1Configured } from "@/lib/d1";
+import { dbFirst, isDatabaseConfigured } from "@/lib/postgres";
 import { getTeam } from "@/lib/records";
 
 export async function GET(request: NextRequest) {
   const denied = await requireAdmin(request);
   if (denied) return denied;
-  if (!isD1Configured()) {
+  if (!isDatabaseConfigured()) {
     return NextResponse.json(
-      { error: "Cloudflare D1 environment variables are not configured." },
+      { error: "Neon DATABASE_URL is not configured." },
       { status: 503 },
     );
   }
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const denied = await requireAdmin(request);
   if (denied) return denied;
-  if (!isD1Configured()) {
+  if (!isDatabaseConfigured()) {
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
   }
 
@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const meta = await d1Execute(
-    "INSERT INTO team_members (name,role_en,role_te,bio_en,bio_te,image_key,sort_order,created_at) VALUES (?,?,?,?,?,?,?,?)",
+  const created = await dbFirst<{ id: number }>(
+    "INSERT INTO team_members (name,role_en,role_te,bio_en,bio_te,image_key,sort_order,created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id",
     [
       body.name,
       body.roleEn,
@@ -43,5 +43,5 @@ export async function POST(request: NextRequest) {
       new Date().toISOString(),
     ],
   );
-  return NextResponse.json({ ok: true, id: meta.last_row_id });
+  return NextResponse.json({ ok: true, id: created?.id });
 }

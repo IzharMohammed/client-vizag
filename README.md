@@ -1,4 +1,4 @@
-# Andhra Root Kitchens (Chettu Kinda Pesarattu)
+# Andhra Roots Kitchen (Chettu Kinda Pesarattu)
 
 A bilingual English/Telugu restaurant website for Vizag. It includes a public menu, owner-managed testimonials, optional live Google reviews, team profiles, and a password-protected admin dashboard. Neon Postgres stores records and Cloudflare R2 stores uploaded images.
 

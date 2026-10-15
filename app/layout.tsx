@@ -3,24 +3,24 @@ import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const siteUrl = getSiteUrl();
-const restaurantName = "Andhra Root Kitchens (Chettu Kinda Pesarattu)";
+const restaurantName = "Andhra Roots Kitchen (Chettu Kinda Pesarattu)";
 const title = `${restaurantName} | Andhra Breakfast in Vizag`;
 const description =
-  "Andhra Root Kitchens (Chettu Kinda Pesarattu) serves fresh pesarattu, idli, poori and authentic Andhra breakfast in Visakhapatnam. Explore our English–Telugu menu and guest reviews.";
+  "Andhra Roots Kitchen (Chettu Kinda Pesarattu) serves fresh pesarattu, idli, poori and authentic Andhra breakfast in Visakhapatnam. Explore our English–Telugu menu and guest reviews.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: title,
-    template: "%s | Andhra Root Kitchens",
+    template: "%s | Andhra Roots Kitchen",
   },
   description,
   applicationName: restaurantName,
   category: "restaurant",
   keywords: [
     "pesarattu Vizag",
-    "Andhra Root Kitchens",
-    "Andhra Root Kitchens Vizag",
+    "Andhra Roots Kitchen",
+    "Andhra Roots Kitchen Vizag",
     "Chettu Kinda Pesarattu",
     "Andhra breakfast Visakhapatnam",
     "best pesarattu Vizag",
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
+  icons: { icon: "/favicon.png", shortcut: "/favicon.png", apple: "/favicon.png" },
 };
 
 export const viewport: Viewport = {
@@ -87,6 +87,7 @@ export default function RootLayout({
     description,
     url: siteUrl,
     image: `${siteUrl}/images/pesarattu-hero.png`,
+    logo: `${siteUrl}/images/brand/andhra-roots-logo.webp`,
     hasMenu: `${siteUrl}/#menu`,
     servesCuisine: ["Andhra", "South Indian", "Vegetarian"],
     knowsLanguage: ["en-IN", "te-IN"],
